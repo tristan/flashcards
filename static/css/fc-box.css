@@ -1,0 +1,25 @@
+.fc-box {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.fc-box-borders:before {
+    content: '「';
+    color: #777;
+    position: absolute;
+    transform: translate(-100%, -25%);
+    line-height: 40px;
+    font-size: 36px;
+}
+.fc-box-borders:after {
+    content: '」';
+    color: #777;
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    transform: translate(100%, 50%);
+    line-height: 40px;
+    font-size: 36px;
+}

@@ -1,0 +1,49 @@
+
+/*
+.fc-box form input {
+    border-radius: 2px;
+    border: 2px solid #eee;
+    padding: 8px;
+    font-size: 20px;
+}
+*/
+
+.fc-box form input, .fc-box form textarea, .fc-box form select {
+    border: 0;
+    border-bottom: 1px solid rgba(0,0,0,0.08);
+    width: 100%;
+    padding: .5em 0;
+    display: block;
+    border-radius: 0;
+}
+
+.fc-box form input[type=submit] {
+    color: inherit;
+    width: initial;
+    background: transparent;
+    border-top: 0;
+    border-left: 0;
+    border-right: 0;
+    border-bottom: 1px solid;
+    border-radius: 0;
+    padding-bottom: 0;
+    text-align: right;
+    -webkit-appearance: button;
+    cursor: pointer;
+}
+
+.fc-box form input[type=checkbox] {
+    width: initial;
+}
+
+.fc-box form input[type=submit]:hover {
+    color: #777;
+}
+
+.fc-box form textarea {
+    font-family: inherit;
+}
+
+.fc-box form *:focus {
+    outline: 0;
+}
