@@ -1,0 +1,12 @@
+.swap .front {
+    display: block;
+}
+.swap:hover .front {
+    display: none;
+}
+.swap .back {
+    display: none;
+}
+.swap:hover .back {
+    display: block;
+}

@@ -1,0 +1,70 @@
+/* LOADING ANIMATION */
+
+.loading {
+    width: 200px;
+    height: 40px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    margin-left: -120px;
+    margin-top: -40px;
+    font-size: 36px;
+    perspective: 800px;
+}
+
+.loading > .card {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    transform-style: preserve-3d;
+    transition: transform 1s;
+    text-align: center;
+}
+
+.loading > .card figure {
+    margin: 0;
+    display: block;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    backface-visibility: hidden;
+}
+
+.loading > .card .front {
+}
+.loading > .card .back {
+    transform: rotateX( 180deg );
+}
+
+.loading > .card {
+    animation-duration: 1s;
+    animation-name: loadingflip;
+    animation-iteration-count: infinite;
+}
+
+body .loading:before {
+    content: '「';
+    color: #777;
+    position: absolute;
+    left: -40px;
+    line-height: 40px;
+}
+body .loading:after {
+    content: '」';
+    color: #777;
+    position: absolute;
+    right: -40px;
+    line-height: 40px;
+}
+
+@keyframes loadingflip {
+  0% {
+      transform: rotateX(0deg);
+  }
+  50% {
+      transform: rotateX(180deg);
+  }
+  100% {
+      transform: rotateX(360deg);
+  }
+}

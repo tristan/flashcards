@@ -27,6 +27,36 @@
         };
     }
 
+    function data2card(data) {
+        if (data.hasOwnProperty('frame')) {
+            var frame = data.frame;
+            return {
+                card_id: frame.frame_id,
+                type: 'frame',
+                front: {
+                    language: "漢字",
+                    text: frame.kanji
+                },
+                back: {
+                    case_sensitive: false,
+                    text: frame.keyword,
+                    language: "keyword"
+
+                }
+            }
+        }
+    }
+
+    function card2config(card, success) {
+        if (card.type == 'frame') {
+            return {
+                type: 'frame',
+                frame_id: card.card_id,
+                success: success
+            };
+        }
+    }
+
     SessionController.$inject = ['$scope', '$http', '$q', '$timeout', 'StateService'];
     function SessionController($scope, $http, $q, $timeout, state) {
         var ctrl = this;
@@ -38,7 +68,7 @@
         $http.post('/api/session').success(function(data) {
             session_id = data.session_id;
             ctrl.session_start = Date.now();
-            ctrl.card = data.card;
+            ctrl.card = data2card(data);
             ctrl.card_count = 0;
             ctrl.correct = 0;
         });
@@ -58,12 +88,10 @@
                 ctrl.state = correct ? 'correct' : 'incorrect';
             });
             ctrl.next_card = $q.defer();
-            $http.put('/api/session', {
-                card_id: ctrl.card.card_id,
-                success: correct
-            }).success(function(data) {
-                ctrl.next_card.resolve(data.card);
-            });
+            $http.put('/api/session', card2config(ctrl.card, correct))
+                .success(function(data) {
+                    ctrl.next_card.resolve(data2card(data));
+                });
         };
 
         this.changeCard = function() {

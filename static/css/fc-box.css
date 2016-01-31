@@ -9,7 +9,7 @@
     content: '「';
     color: #777;
     position: absolute;
-    transform: translate(-100%, -25%);
+    transform: translate(-100%, -30%);
     line-height: 40px;
     font-size: 36px;
 }

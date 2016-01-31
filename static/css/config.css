@@ -1,0 +1,17 @@
+.content table {
+    width: 75%;
+    table-layout: fixed;
+}
+
+.content table tr:nth-of-type(odd) {
+    background-color: #f9f9f9;
+}
+
+.content table td.kanji {
+    font-family: "ＭＳ Ｐ明朝";
+    font-size: 2em;
+}
+
+.content table tr td input {
+    width: 100%;
+}

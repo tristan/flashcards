@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html ng-app="flashcards">
+<html lang="en" ng-app="flashcards">
   <head>
     <meta charset="UTF-8">
     <base href="/">
-    <script src="/static/js/angular.js"></script>
-    <script src="/static/js/angular-animate.js"></script>
+    <script src="/vendor/js/angular-1.4.8.js"></script>
+    <script src="/vendor/js/angular-animate-1.4.8.js"></script>
     <script src="/static/js/flashcards.js"></script>
     <script src="/static/js/fc-state-service.js"></script>
     <script src="/static/js/fc-setup.js"></script>
@@ -12,9 +12,15 @@
     <script src="/static/js/fc-focus-on.js"></script>
     <script src="/static/js/fc-on-enter.js"></script>
     <script src="/static/js/fc-tag-input.js"></script>
-    <link rel="stylesheet" type="text/css" href="/static/css/flashcards.css">
-    <link rel="stylesheet" type="text/css" href="/static/css/fc-box.css">
+    <link rel="stylesheet" type="text/css" href="/static/css/base.css">
+    <link rel="stylesheet" type="text/css" href="/static/css/cards.css">
+    <link rel="stylesheet" type="text/css" href="/static/css/config.css">
     <link rel="stylesheet" type="text/css" href="/static/css/forms.css">
+    <link rel="stylesheet" type="text/css" href="/static/css/loading.css">
+    <link rel="stylesheet" type="text/css" href="/static/css/login.css">
+    <link rel="stylesheet" type="text/css" href="/static/css/menu.css">
+    <link rel="stylesheet" type="text/css" href="/static/css/swap.css">
+    <link rel="stylesheet" type="text/css" href="/static/css/fc-box.css">
   </head>
   <body>
     <!-- LOADING -->
@@ -39,107 +45,56 @@
         <input type="submit" style="display: none">
       </form>
     </section>
+
     <!-- HOME MENU -->
-    <section ng-if="state.section === 'home'" class="home menu fc-box fc-box-borders fadein fadeout">
+    <section ng-if="state.section === 'home'" class="home menu fc-box fc-box-borders fadein fadeout"
+             ng-controller="OptionsController as opts">
       <div class="header">
-        hi {{ state.user.name }} !
+        今日は {{ state.user.name }} !
       </div>
-      <ul class="options" ng-controller="OptionsController as opts">
-        <li><a href="", ng-click="opts.start()">start</a></li>
-        <li><a href="/setup/", ng-click="opts.setup()">setup</a></li>
-        <li><a href="", ng-click="opts.logout()">logout</a></li>
-      </ul>
-    </section>
-
-    <!-- SETUP -->
-    <section ng-if="state.section === 'setup'" class="setup menu fc-box fc-box-borders fadein fadeout" ng-controller="SetupController as ctrl">
-      <div class="header">
-        Setup
-      </div>
-      <ul class="options">
-        <li><a href="/setup/languages/", ng-click="ctrl.languages()">languages</a></li>
-        <li><a href="/setup/concepts/", ng-click="ctrl.concepts()">concepts</a></li>
-        <li><a href="/setup/cards/", ng-click="ctrl.cards()">cards</a></li>
-        <li><a href="/", ng-click="ctrl.done()">done</a></li>
-      </ul>
-    </section>
-
-    <!-- LANGUAGES -->
-    <section ng-if="state.section === 'languages'" class="config languages fadein fadeout"
-             ng-controller="LanguageSetupController as ctrl">
-      <div class="header">
-        <div class="title">
-          Languages
-        </div>
-        <ul class="options">
-          <li><a href="/setup/", ng-click="ctrl.done()">done</a></li>
-        </ul>
-      </div>
-      <div class="content">
-        <div class="columns">
-          <div class="entry" ng-repeat="language in ctrl.languages">
-            {{ language.name }}
+      <hr/>
+      <div class="options">
+        <div class="option"><a href="", ng-click="opts.start()">
+          <div class="swap">
+            <div class="front">begin</div>
+            <div class="back">始まる</div>
           </div>
-        </div>
-        <div class="create">
-          <form ng-submit="ctrl.createNewLanguage()">
-            <input type="text" placeholder="Add New Language", ng-model="ctrl.new_language_name">
-            <input type="submit" style="display: none">
-          </form>
-        </div>
+        </a></div>
+        <div class="option"><a href="", ng-click="opts.setup()">
+          <div class="swap"><div class="front">configure</div><div class="back">コンフィグ</div></div>
+        </a></div>
+        <div class="option"><a href="", ng-click="opts.logout()">
+          <div class="swap"><div class="front">logout</div><div class="back">ログアウト</div></div>
+        </a></div>
       </div>
     </section>
 
     <!-- CONCEPTS -->
-    <section ng-if="state.section === 'concepts'" class="config concepts fadein fadeout"
-             ng-controller="ConceptSetupController as ctrl">
+    <section ng-if="state.section === 'config'" class="config fadein fadeout"
+             ng-controller="ConfigController as ctrl">
       <div class="header">
         <div class="title">
-          Concepts
+          Configuration
         </div>
         <ul class="options">
-          <li><a href="", ng-click="ctrl.openEditConceptForm()">new</a></li>
-          <li><a href="/setup/", ng-click="ctrl.done()">done</a></li>
+          <li><a href="", ng-click="ctrl.done()">back</a></li>
         </ul>
       </div>
-      <div class="content" ng-hide="state.edit_concept">
-        <div class="columns" ng-hide="ctrl.new_concept">
-          <div class="entry" ng-repeat="concept in ctrl.concepts">
-            <a href="" ng-click="ctrl.openEditConceptForm(concept)">{{ concept.name }}</a>
-          </div>
-        </div>
-      </div>
-      <div ng-show="state.edit_concept" class="edit-concept fc-box fc-box-borders">
-        <form ng-submit="ctrl.saveConcept()">
-          <section>
-            <div class="header">
-              Concept
-            </div>
-            <input type="text" placeholder="Name", ng-model="ctrl.concept.name">
-            <input type="text" placeholder="Concept Tags"
-                   fc-tag-input fc-options="ctrl.tags" fc-options-key="name" fc-model="ctrl.concept.tags">
-            <textarea placeholder="Description" rows="3", ng-model="ctrl.concept.details"></textarea>
-          </section>
-          <section ng-repeat="language in ctrl.languages">
-            <div class="header">
-              {{ language.name }}
-            </div>
-            <input type="text" placeholder="Value", ng-model="ctrl.concept.faces[language.language_id].text">
-            <div class="switches">
-              <label>
-                <div>Front Only:</div>
-                <input type="checkbox" ng-model="ctrl.concept.faces[language.language_id].front_only">
-              </label>
-              <label>
-                <div>Case Sensitive:</div>
-                <input type="checkbox" ng-model="ctrl.concept.faces[language.language_id].case_sensitive">
-              </label>
-            </div>
-          </section>
-          <div>
-            <input type="submit" value="Save">
-          </div>
-        </form>
+      <div class="content">
+        <table>
+          <tr ng-repeat="frame in ctrl.frames">
+            <td fc-editable="frame.frame_id" dirty-count="frame.dirty"></td>
+            <td fc-editable="frame.kanji" dirty-count="frame.dirty" class="kanji"></td>
+            <td fc-editable="frame.keyword" dirty-count="frame.dirty"></td>
+            <td fc-editable="frame.primative" dirty-count="frame.dirty"></td>
+            <td fc-editable="frame._primatives" dirty-count="frame.dirty"></td>
+            <td class="tools">
+              <a href="" ng-click="ctrl.addRow($index + 1)">+</a>
+              <a href="" ng-show="frame.dirty" ng-click="ctrl.saveRow($index)">蓄える</a>
+              <a href="" ng-click="ctrl.deleteRow($index)">delete</a>
+            </td>
+          </tr>
+        </table>
       </div>
     </section>
 

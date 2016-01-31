@@ -1,13 +1,12 @@
 
-/*
-.fc-box form input {
-    border-radius: 2px;
-    border: 2px solid #eee;
-    padding: 8px;
-    font-size: 20px;
+form *:focus {
+    outline: 0;
 }
-*/
 
+form input {
+}
+
+/*
 .fc-box form input, .fc-box form textarea, .fc-box form select {
     border: 0;
     border-bottom: 1px solid rgba(0,0,0,0.08);
@@ -47,3 +46,4 @@
 .fc-box form *:focus {
     outline: 0;
 }
+*.

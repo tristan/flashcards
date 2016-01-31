@@ -1,0 +1,100 @@
+/* CARDS */
+
+.cards {
+    font-size: 1.5em;
+    display: flex;
+    align-content: space-between;
+    justify-content: space-between;
+    flex-direction: column;
+}
+
+.cards .card {
+    width: 400px;
+    height: 150px;
+    padding: 20px;
+    border: 5px solid #777;
+    border-radius: 25px;
+    display: flex;
+    flex-direction: column;
+}
+
+.cards .card.correct {
+    border-color: #009800;
+}
+
+.cards .card.incorrect {
+    border-color: #e11d21;
+}
+
+.cards .languages {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+}
+
+.cards .languages .language {
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    text-align: center;
+}
+
+.japanese {
+    font-family: "ＭＳ Ｐ明朝";
+}
+
+.cards .sep {
+    font-size: 3em;
+    padding: 0 10px;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    text-align: center;
+}
+
+.cards .language, .cards .text {
+    text-align: center;
+}
+
+.cards .text {
+    font-size: 2.5em;
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    text-align: center;
+}
+
+
+.cards .back input {
+    border: 0;
+    width: 100%;
+    padding: 0;
+    display: block;
+    border-radius: 0;
+    text-align: center;
+    font-size: 1em;
+    flex: 1;
+}
+
+.cards .back input:disabled {
+    background-color: white;
+    color: black;
+    cursor: text;
+}
+
+.cards .back input:focus {
+    outline: 0;
+}
+
+.cards .incorrect input {
+    text-decoration: line-through;
+}
+
+.cards .answer {
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    text-align: center;
+    position: relative;
+}

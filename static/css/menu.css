@@ -1,0 +1,30 @@
+/* MENUS */
+
+.menu {
+    width: 263px;
+    font-size: 36px;
+}
+
+.menu > .header {
+}
+
+.menu > .options {
+    text-align: right;
+    margin-bottom: 0px;
+}
+
+.menu > .options > .option {
+    display: flex;
+    flex-direction: row-reverse;
+}
+
+.menu > .options > .option > a {
+    text-decoration: none;
+    display: flex;
+    color: black;
+}
+
+.menu > .options > .option > a:hover {
+    color: #777;
+    cursor: pointer;
+}

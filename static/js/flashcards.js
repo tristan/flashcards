@@ -103,8 +103,8 @@
         };
         this.setup = function() {
             state.push(function() {
-                state.section = 'setup'
-            }, '/setup/');
+                state.section = 'config'
+            }, '/config/');
         };
         this.start = function() {
             state.push(function() {

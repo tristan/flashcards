@@ -6,16 +6,19 @@ python: env requirements.txt
 env:
 	virtualenv env
 
-deps: static/js/angular.js static/js/angular-animate.js
+deps: vendor/js/angular-1.4.8.js vendor/js/angular-animate-1.4.8.js
 
-static/js/angular.js: static/js
-	curl -o static/js/angular.js https://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.js
+vendor/js/angular-1.4.8.js: vendor/js
+	curl -o vendor/js/angular-1.4.8.js https://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.js
 
-static/js/angular-animate.js: static/js
-	curl -o static/js/angular-animate.js https://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular-animate.js
+vendor/js/angular-animate-1.4.8.js: vendor/js
+	curl -o vendor/js/angular-animate-1.4.8.js https://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular-animate.js
 
-static/js:
-	mkdir -p static/js
+vendor/js:
+	mkdir -p vendor/js
+
+vendor/css:
+	mkdir -p vendor/css
 
 db: database.db
 

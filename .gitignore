@@ -1,5 +1,6 @@
 database.db
 secret.key
 env/
+vendor/
 TODO.txt
 *.pyc

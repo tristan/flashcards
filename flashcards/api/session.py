@@ -1,9 +1,12 @@
 import tornado.web
 from flashcards.handlers import BaseHandler
-from flashcards.api.card import CardMixin
+from flashcards.api.frame import FrameMixin
 import time
+import math
 
-class SessionHandler(BaseHandler, CardMixin):
+WEIGHT_DEFAULT = 1048576
+
+class SessionHandler(BaseHandler, FrameMixin):
 
     @tornado.web.authenticated
     def post(self):
@@ -11,10 +14,10 @@ class SessionHandler(BaseHandler, CardMixin):
 
         # initialise card weirds for the user
         self.db.execute(
-            "INSERT INTO user_card_weights (user_id, card_id) "
-            "SELECT ?, card_id FROM cards WHERE NOT EXISTS "
-            "(SELECT 1 FROM user_card_weights WHERE user_id = ? AND user_card_weights.card_id = cards.card_id)",
-            (self.current_user.user_id, self.current_user.user_id))
+            "INSERT INTO user_frame_weights (user_id, frame_id, weight) "
+            "SELECT ?, frame_id, ? FROM frames WHERE NOT EXISTS "
+            "(SELECT 1 FROM user_frame_weights WHERE user_id = ? AND user_frame_weights.frame_id = frames.frame_id)",
+            (self.current_user.user_id, WEIGHT_DEFAULT, self.current_user.user_id))
 
         # create new session
         cursor = self.db.execute(
@@ -23,9 +26,9 @@ class SessionHandler(BaseHandler, CardMixin):
         session_id = cursor.lastrowid
 
         self.db.commit()
-        card = self.get_card(self.get_random_card())
+        frame = self.get_frame(self.get_random_frame())
         self.set_secure_cookie('session', str(session_id))
-        self.write(dict(session_id=session_id, card=card))
+        self.write(dict(session_id=session_id, frame=frame))
 
     @tornado.web.authenticated
     def put(self):
@@ -34,32 +37,32 @@ class SessionHandler(BaseHandler, CardMixin):
         if not session_id:
             raise tornado.web.HTTPError(400, reason="no_session")
         session_id = int(session_id)
-        card_id = int(self.get_argument("card_id"))
+        frame_id = int(self.get_argument("frame_id"))
         success = self.get_argument("success").lower() == "true"
-        card = self.get_user_card(self.current_user.user_id, card_id)
-        if card:
+        frame = self.get_user_frame(self.current_user.user_id, frame_id)
+        if frame:
             now = time.time()
             if success:
-                weight = card.weight - 1
-                failure_count = card.failure_count
-                success_count = card.success_count + 1
+                weight = math.ceil(frame.weight / 2)
+                failure_count = frame.failure_count
+                success_count = frame.success_count + 1
             else:
-                weight = 100
-                failure_count = card.failure_count + 1
-                success_count = card.success_count
+                weight = WEIGHT_DEFAULT
+                failure_count = frame.failure_count + 1
+                success_count = frame.success_count
             self.db.execute(
-                "UPDATE user_card_weights "
+                "UPDATE user_frame_weights "
                 "SET weight = ?, last_seen = ?, success_count = ?, failure_count = ? "
-                "WHERE user_id = ? AND card_id = ?",
+                "WHERE user_id = ? AND frame_id = ?",
                 (weight, now, success_count, failure_count,
-                 self.current_user.user_id, card_id))
+                 self.current_user.user_id, frame_id))
             self.db.execute(
-                "INSERT INTO session_cards (session_id, user_id, card_id, success, time) "
+                "INSERT INTO session_frames (session_id, user_id, frame_id, success, time) "
                 "VALUES (?, ?, ?, ?, ?)",
-                (session_id, self.current_user.user_id, card_id, success, now))
+                (session_id, self.current_user.user_id, frame_id, success, now))
             self.db.commit()
-        card = self.get_card(self.get_random_card())
-        self.write(dict(session_id=session_id, card=card))
+        frame = self.get_frame(self.get_random_frame())
+        self.write(dict(session_id=session_id, frame=frame))
 
     @tornado.web.authenticated
     def delete(self):
