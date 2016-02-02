@@ -97,9 +97,8 @@
 
         this.done = function() {
             state.push(function() {
-                state.section = 'setup'
-                state.edit_concept = false;
-            }, '/setup/');
+                state.section = 'home'
+            }, '/');
         };
     }
 
