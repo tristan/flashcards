@@ -36,20 +36,20 @@ class FrameMixin(object):
         self.db.execute("UPDATE session_frames set frame_id = frame_id - 1 WHERE frame_id > ?", (frame_id,))
         # TODO: primatives
 
-    def get_random_frame(self):
+    def get_random_frame(self, session_type):
         """selects a random card from the user's cards"""
 
         # get weight sum
         total_weight, = self.db.execute(
-            "SELECT SUM(weight) FROM user_frame_weights "
-            "WHERE user_id = ? AND active = 1",
+            "SELECT SUM(weight) FROM user_card_weights_%s "
+            "WHERE user_id = ? AND active = 1" % session_type,
             (self.current_user.user_id,)).fetchone()
 
         # get all cards
         frames = self.db.execute(
-            "SELECT frame_id, weight FROM user_frame_weights "
+            "SELECT frame_id, weight FROM user_card_weights_%s "
             "WHERE user_id = ? AND active = 1 "
-            "ORDER BY weight DESC, last_seen",
+            "ORDER BY weight DESC, last_seen" % session_type,
             (self.current_user.user_id,)).fetchall()
 
         # pick value
@@ -76,11 +76,11 @@ class FrameMixin(object):
 
         raise Exception("Couldn't find frame with id: %s" % frame_id)
 
-    def get_user_frame(self, user_id, frame_id):
+    def get_user_frame(self, user_id, frame_id, session_type):
         card = self.db.execute(
             "SELECT user_id, frame_id, weight, last_seen, success_count, failure_count, active "
-            "FROM user_frame_weights "
-            "WHERE user_id = ? AND frame_id = ?",
+            "FROM user_card_weights_%s "
+            "WHERE user_id = ? AND frame_id = ?" % session_type,
             (user_id, frame_id)).fetchone()
         if card:
             return UserFrame(*card)

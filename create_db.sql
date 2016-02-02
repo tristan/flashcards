@@ -29,11 +29,30 @@ CREATE TABLE IF NOT EXISTS users (
     picture BLOB
 );
 
-CREATE TABLE IF NOT EXISTS user_frame_weights (
+-- kanji -> keyword cards
+-- these are cards where the front is a kanji and the back is a keyword
+CREATE TABLE IF NOT EXISTS user_card_weights_kanji (
     user_id INTEGER NOT NULL REFERENCES users (user_id) ON DELETE CASCADE,
     frame_id INTEGER NOT NULL REFERENCES frames (frame_id) ON DELETE CASCADE,
     -- the weight of the frame for the user
     weight INTEGER NOT NULL DEFAULT 1048576,
+    -- the time the frame was last seen
+    last_seen INTEGER DEFAULT 0,
+    -- count the number of times the user has gotten this frame right or wrong
+    success_count INTEGER DEFAULT 0,
+    failure_count INTEGER DEFAULT 0,
+    -- whether or not the frame is active, i.e. if it should be displayed to the
+    -- user.
+    active INTEGER NOT NULL DEFAULT 1,
+    PRIMARY KEY(user_id, frame_id)
+);
+
+-- keyword -> kanji cards
+CREATE TABLE IF NOT EXISTS user_card_weights_keyword (
+    user_id INTEGER NOT NULL REFERENCES users (user_id) ON DELETE CASCADE,
+    frame_id INTEGER NOT NULL REFERENCES frames (frame_id) ON DELETE CASCADE,
+    -- the weight of the frame for the user
+    weight INTEGER NOT NULL DEFAULT 3325,
     -- the time the frame was last seen
     last_seen INTEGER DEFAULT 0,
     -- count the number of times the user has gotten this frame right or wrong
@@ -52,11 +71,22 @@ CREATE TABLE IF NOT EXISTS sessions (
     -- the time the session started
     start_time INTEGER NOT NULL,
     -- the time the session ended
-    end_time INTEGER
+    end_time INTEGER,
+    -- the type of this session (e.g. 'kanji' or 'keyword')
+    type TEXT
 );
 
 -- which frames the user saw and got wrong or right in the session
-CREATE TABLE IF NOT EXISTS session_frames (
+CREATE TABLE IF NOT EXISTS session_cards_kanji (
+    session_frames_id INTEGER PRIMARY KEY,
+    session_id INTEGER NOT NULL REFERENCES sessions (session_id) ON DELETE CASCADE,
+    user_id INTEGER NOT NULL REFERENCES users (user_id) ON DELETE CASCADE,
+    frame_id INTEGER NOT NULL REFERENCES frames (frame_id) ON DELETE CASCADE,
+    success INTEGER,
+    time INTEGER NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS session_cards_keyword (
     session_frames_id INTEGER PRIMARY KEY,
     session_id INTEGER NOT NULL REFERENCES sessions (session_id) ON DELETE CASCADE,
     user_id INTEGER NOT NULL REFERENCES users (user_id) ON DELETE CASCADE,

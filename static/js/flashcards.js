@@ -106,9 +106,9 @@
                 state.section = 'config'
             }, '/config/');
         };
-        this.start = function() {
+        this.start = function(section) {
             state.push(function() {
-                state.section = 'session'
+                state.section = section + '-session'
             });
         };
     }

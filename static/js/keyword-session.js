@@ -2,7 +2,7 @@
     'use strict';
 
     angular.module('flashcards')
-        .directive('fcKanjiCards', CardsDirective)
+        .directive('fcKeywordCards', CardsDirective)
     ;
 
     CardsDirective.$inject = ['$window'];
@@ -18,8 +18,13 @@
                 });
 
                 function handleKeypress(event) {
-                    if (event.which === 13 && ctrl.state !== 'answering') {
-                        ctrl.changeCard();
+                    console.log(event.keyCode);
+                    if (event.keyCode == 32 || event.keyCode == 13) {
+                        $scope.$apply(ctrl.showBack);
+                    } else if (ctrl.state == 'back' && event.keyCode == 43) { // +
+                        ctrl.scoreCard(true);
+                    } else if (ctrl.state == 'back' && event.keyCode == 45) { // -
+                        ctrl.scoreCard(false);
                     }
                 }
             }
@@ -32,15 +37,13 @@
             return {
                 card_id: frame.frame_id,
                 type: 'frame',
-                front: {
+                back: {
                     language: "漢字",
                     text: frame.kanji
                 },
-                back: {
-                    case_sensitive: false,
+                front: {
                     text: frame.keyword,
                     language: "keyword"
-
                 }
             }
         }
@@ -62,9 +65,9 @@
 
         var session_id;
 
-        ctrl.state = 'answering';
+        ctrl.state = 'front';
 
-        $http.post('/api/session', {type: 'kanji'}).success(function(data) {
+        $http.post('/api/session', {type: 'keyword'}).success(function(data) {
             session_id = data.session_id;
             ctrl.session_start = Date.now();
             ctrl.card = data2card(data);
@@ -72,37 +75,25 @@
             ctrl.correct = 0;
         });
 
-        this.checkAnswer = function(value) {
-            var correct;
-            if (ctrl.card.back.case_sensitive) {
-                correct = value === ctrl.card.back.text;
-            } else {
-                correct = value.toLowerCase() === ctrl.card.back.text.toLowerCase();
-            }
-            $scope.$apply(function() {
-                if (correct) {
-                    ctrl.correct += 1;
-                }
-                ctrl.card_count += 1;
-                ctrl.state = correct ? 'correct' : 'incorrect';
-            });
-            ctrl.next_card = $q.defer();
+        this.showBack = function() {
+            ctrl.state = 'back';
+        }
+
+        this.scoreCard = function(correct) {
+            var next_card = $q.defer();
             $http.put('/api/session', card2config(ctrl.card, correct))
                 .success(function(data) {
-                    ctrl.next_card.resolve(data2card(data));
+                    ctrl.card_count += 1;
+                    if (correct) {
+                        ctrl.correct += 1;
+                    }
+                    next_card.resolve(data2card(data));
                 });
-        };
-
-        this.changeCard = function() {
-            if (ctrl.next_card) {
-                ctrl.next_card.promise.then(function(card) {
-                    ctrl.state = 'answering';
-                    ctrl.answer = '';
-                    ctrl.card = card;
-                    ctrl.next_card = null;
-                });
-            } else {
-            }
+            next_card.promise.then(function(card) {
+                ctrl.state = 'front';
+                ctrl.card = card;
+                ctrl.next_card = null;
+            });
         };
 
         this.stop = function() {
@@ -111,5 +102,4 @@
             $http.delete('/api/session');
         };
     }
-
 })();

@@ -1,7 +1,7 @@
 
 ## weighting calcaulations
 
-- initial weight is `1048576` so that it can be divided by `2` `20` times.
+- initial weight is `3325` so that it can be divided by `1.5` `20` times.
 
 - sum all card weights
 - generate random number between 0 and card weights
@@ -9,7 +9,7 @@
 - traverse cards, summing up the scores until the random number has been passed
 - if we get to a card with score 0, return that card
 
-- successful match = weight /= 2
+- successful match = weight * 0.75
 - failed match = weight = initial
 
 ## database migrations

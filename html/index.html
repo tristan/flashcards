@@ -9,9 +9,11 @@
     <script src="/static/js/fc-state-service.js"></script>
     <script src="/static/js/fc-setup.js"></script>
     <script src="/static/js/fc-session.js"></script>
+    <script src="/static/js/keyword-session.js"></script>
     <script src="/static/js/fc-focus-on.js"></script>
     <script src="/static/js/fc-on-enter.js"></script>
     <script src="/static/js/fc-tag-input.js"></script>
+    <script src="/static/js/fc-time-since.js"></script>
     <link rel="stylesheet" type="text/css" href="/static/css/base.css">
     <link rel="stylesheet" type="text/css" href="/static/css/cards.css">
     <link rel="stylesheet" type="text/css" href="/static/css/config.css">
@@ -32,7 +34,7 @@
     </section>
 
     <!-- LOGIN -->
-    <section ng-if="state.section === 'login'" class="login fc-box fc-box-borders fadein fadeout">
+    <section ng-if="state.section == 'login'" class="login fc-box fc-box-borders fadein fadeout">
       <form ng-controller="LoginController as form" ng-submit="form.submit()">
         <div ng-hide="state.create_user" class="content">
           <input type="text" placeholder="Username", ng-model="form.username", fc-focus-on="!state.create_user">
@@ -47,19 +49,32 @@
     </section>
 
     <!-- HOME MENU -->
-    <section ng-if="state.section === 'home'" class="home menu fc-box fc-box-borders fadein fadeout"
+    <section ng-if="state.section == 'home'" class="home menu fc-box fc-box-borders fadein fadeout"
              ng-controller="OptionsController as opts">
       <div class="header">
         今日は {{ state.user.name }} !
       </div>
       <hr/>
       <div class="options">
-        <div class="option"><a href="", ng-click="opts.start()">
+        <div class="option">
+          <a href="", ng-click="opts.start('kanji')">
           <div class="swap">
             <div class="front">begin</div>
             <div class="back">始まる</div>
           </div>
-        </a></div>
+          </a>
+          <div class="option-left">kanji:</div>
+        </div>
+        <div class="option">
+          <a href="", ng-click="opts.start('keywords')">
+            <div class="swap">
+              <div class="front">begin</div>
+              <div class="back">始まる</div>
+            </div>
+          </a>
+          <div class="option-left">keywords:</div>
+        </div>
+        <hr/>
         <div class="option"><a href="", ng-click="opts.setup()">
           <div class="swap"><div class="front">configure</div><div class="back">コンフィグ</div></div>
         </a></div>
@@ -70,7 +85,7 @@
     </section>
 
     <!-- CONCEPTS -->
-    <section ng-if="state.section === 'config'" class="config fadein fadeout"
+    <section ng-if="state.section == 'config'" class="config fadein fadeout"
              ng-controller="ConfigController as ctrl">
       <div class="header">
         <div class="title">
@@ -99,9 +114,9 @@
     </section>
 
     <!-- SESSION -->
-    <section ng-if="state.section === 'session'" class="session config fadein fadeout"
-             fc-cards>
-      <div ng-hide="ctrl.state === 'stopped'">
+    <section ng-if="state.section == 'kanji-session'" class="session config fadein fadeout"
+             fc-kanji-cards>
+      <div ng-hide="ctrl.state == 'stopped'">
         <div class="header">
           <div class="title">
             <div>Session in progress</div>
@@ -122,18 +137,58 @@
             <div class="sep">⇨</div>
             <div class="language">{{ ctrl.card.back.language }}</div>
           </div>
-          <div class="back card" ng-class="{'correct': ctrl.state === 'correct', 'incorrect': ctrl.state === 'incorrect'}">
+          <div class="back card" ng-class="{'correct': ctrl.state == 'correct', 'incorrect': ctrl.state == 'incorrect'}">
             <div class="text">
               <input type="text" ng-model="ctrl.answer"
-                     fc-focus-on="ctrl.state === 'answering'"
+                     fc-focus-on="ctrl.state == 'answering'"
                      fc-on-enter="ctrl.checkAnswer($value)"
-                     ng-disabled="ctrl.state !== 'answering'">
-              <div ng-show="ctrl.state === 'incorrect'" class="answer">{{ ctrl.state === 'answering' ? '' : ctrl.card.back.text }}</div>
+                     ng-disabled="ctrl.state != 'answering'">
+              <div ng-show="ctrl.state == 'incorrect'" class="answer">{{ ctrl.state == 'answering' ? '' : ctrl.card.back.text }}</div>
             </div>
           </div>
         </div>
       </div>
-      <div ng-show="ctrl.state === 'stopped'" class="fc-box fc-box-borders">
+      <div ng-show="ctrl.state == 'stopped'" class="fc-box fc-box-borders">
+        <div>Time taken: <span fc-time-since start="ctrl.session_start" end="ctrl.session_end"></span></div>
+        <div>Cards correct: {{ ctrl.correct }} / {{ ctrl.card_count }}</div>
+      </div>
+    </section>
+
+    <!-- KEYWORD SESSION -->
+    <section ng-if="state.section == 'keywords-session'" class="session config fadein fadeout"
+             fc-keyword-cards>
+      <div ng-hide="ctrl.state == 'stopped'">
+        <div class="header">
+          <div class="title">
+            <div>Session in progress</div>
+            <div fc-time-since start="ctrl.session_start"></div>
+            <div>{{ ctrl.card_count }} cards</div>
+          </div>
+          <ul class="options">
+            <li><a href="", ng-click="ctrl.stop()">STOP</a></li>
+          </ul>
+        </div>
+        <div class="fc-box cards">
+          <div class="front card">
+            <div class="text japanese">{{ ctrl.card.front.text }}</div>
+          </div>
+
+          <div class="languages">
+            <div class="language">{{ ctrl.card.front.language }}</div>
+            <div class="sep">⇨</div>
+            <div class="language">{{ ctrl.card.back.language }}</div>
+          </div>
+          <div class="back card">
+            <div class="text">
+              <div ng-show="ctrl.state == 'back'" class="japanese answer">{{ ctrl.state == 'back' ? ctrl.card.back.text : '' }}</div>
+            </div>
+            <div class="small">
+              {{ ctrl.state == 'back' ? ctrl.card.card_id : '' }}
+            </div>
+          </div>
+        </div>
+      </div>
+      <div ng-show="ctrl.state == 'stopped'" class="fc-box fc-box-borders">
         <div>Time taken: <span fc-time-since start="ctrl.session_start" end="ctrl.session_end"></span></div>
         <div>Cards correct: {{ ctrl.correct }} / {{ ctrl.card_count }}</div>
       </div>
