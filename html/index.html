@@ -104,7 +104,9 @@
       <div ng-hide="ctrl.state === 'stopped'">
         <div class="header">
           <div class="title">
-            Session in progress
+            <div>Session in progress</div>
+            <div fc-time-since start="ctrl.session_start"></div>
+            <div>{{ ctrl.card_count }} cards</div>
           </div>
           <ul class="options">
             <li><a href="", ng-click="ctrl.stop()">STOP</a></li>

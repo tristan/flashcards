@@ -1,5 +1,10 @@
 /* CARDS */
 
+.session .title {
+    display: flex;
+    justify-content: space-between;
+}
+
 .cards {
     font-size: 1.5em;
     display: flex;
