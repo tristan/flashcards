@@ -19,10 +19,13 @@ class FrameMixin(object):
         self.db.execute("UPDATE primatives set frame_id = frame_id + ? WHERE frame_id >= ?", (increment, first,))
         self.db.execute("UPDATE primatives set primative_id = primative_id + ? WHERE primative_id >= ?", (increment, first,))
         # increment user weights
-        for frame_id, in self.db.execute("SELECT frame_id FROM user_frame_weights WHERE frame_id >= ? ORDER BY frame_id DESC", (first,)):
-            self.db.execute("UPDATE user_frame_weights set frame_id = frame_id + ? WHERE frame_id = ?", (increment, frame_id,))
+        for frame_id, in self.db.execute("SELECT frame_id FROM user_card_weights_kanji WHERE frame_id >= ? ORDER BY frame_id DESC", (first,)):
+            self.db.execute("UPDATE user_card_weights_kanji set frame_id = frame_id + ? WHERE frame_id = ?", (increment, frame_id,))
+        for frame_id, in self.db.execute("SELECT frame_id FROM user_card_weights_keyword WHERE frame_id >= ? ORDER BY frame_id DESC", (first,)):
+            self.db.execute("UPDATE user_card_weights_keyword set frame_id = frame_id + ? WHERE frame_id = ?", (increment, frame_id,))
         # update session data
-        self.db.execute("UPDATE session_frames set frame_id = frame_id + ? WHERE frame_id >= ?", (increment, first,))
+        self.db.execute("UPDATE session_cards_kanji set frame_id = frame_id + ? WHERE frame_id >= ?", (increment, first,))
+        self.db.execute("UPDATE session_cards_keyword set frame_id = frame_id + ? WHERE frame_id >= ?", (increment, first,))
 
     def delete_frame(self, frame_id):
         """removes a frame, and all references to it, and decrements the other
