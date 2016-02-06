@@ -5,7 +5,7 @@ import time
 import math
 
 WEIGHT_DEFAULT = 3325
-WEIGHT_MULTIPLIER = 0.75
+WEIGHT_MULTIPLIER = 1 / 1.5
 
 class SessionHandler(BaseHandler, FrameMixin):
 
