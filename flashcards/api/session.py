@@ -6,6 +6,7 @@ import math
 
 WEIGHT_DEFAULT = 3325
 WEIGHT_MULTIPLIER = 1 / 1.5
+NUM_PREVIOUS_CARDS_TO_EXCLUDE = 8
 
 class SessionHandler(BaseHandler, FrameMixin):
 
@@ -70,8 +71,41 @@ class SessionHandler(BaseHandler, FrameMixin):
                 "VALUES (?, ?, ?, ?, ?)" % session_type,
                 (session_id, self.current_user.user_id, frame_id, success, now))
             self.db.commit()
-        frame = self.get_frame(self.get_random_frame(session_type))
+        # get the last 8 cards
+        last_frames = self.db.execute(
+            "SELECT frame_id FROM session_cards_%s "
+            "WHERE session_id = ? AND user_id = ? "
+            "ORDER BY time desc LIMIT ?" % session_type,
+            (session_id, self.current_user.user_id, NUM_PREVIOUS_CARDS_TO_EXCLUDE)
+        ).fetchall()
+        frame = self.get_frame(self.get_random_frame(session_type, exclude=[f[0] for f in last_frames]))
         self.write(dict(session_id=session_id, frame=frame))
+
+    @tornado.web.authenticated
+    def get(self):
+        session_id = self.get_secure_cookie('session').decode()
+        if not session_id:
+            raise tornado.web.HTTPError(400, reason="no_session")
+        session_id, session_type = session_id.split('|')
+        session_id = int(session_id)
+        skip = self.get_argument('skip', None)
+        frame_id = self.get_argument('frame_id', None)
+        if skip:
+            if frame_id:
+                exclude = [int(frame_id)]
+            else:
+                exclude = []
+            last_frames = self.db.execute(
+                "SELECT frame_id FROM session_cards_%s "
+                "WHERE session_id = ? AND user_id = ? "
+                "ORDER BY time desc LIMIT ?" % session_type,
+                (session_id, self.current_user.user_id, NUM_PREVIOUS_CARDS_TO_EXCLUDE)
+            ).fetchall()
+            exclude.extend([f[0] for f in last_frames])
+            frame = self.get_frame(self.get_random_frame(session_type, exclude=exclude))
+            self.write(dict(session_id=session_id, frame=frame))
+            return
+        raise tornado.web.HTTPError(400, reason="bad_request")
 
     @tornado.web.authenticated
     def delete(self):

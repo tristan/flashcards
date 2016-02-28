@@ -25,6 +25,8 @@
                         ctrl.scoreCard(true);
                     } else if (ctrl.state == 'back' && event.keyCode == 45) { // -
                         ctrl.scoreCard(false);
+                    } else if (event.keyCode == 124 && event.shiftKey) { // shift + \
+                        ctrl.skipCard();
                     }
                 }
             }
@@ -87,6 +89,19 @@
                     if (correct) {
                         ctrl.correct += 1;
                     }
+                    next_card.resolve(data2card(data));
+                });
+            next_card.promise.then(function(card) {
+                ctrl.state = 'front';
+                ctrl.card = card;
+                ctrl.next_card = null;
+            });
+        };
+
+        this.skipCard = function() {
+            var next_card = $q.defer();
+            $http.get('/api/session?skip=true&frame_id=' + ctrl.card.card_id)
+                .success(function(data) {
                     next_card.resolve(data2card(data));
                 });
             next_card.promise.then(function(card) {

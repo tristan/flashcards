@@ -39,20 +39,25 @@ class FrameMixin(object):
         self.db.execute("UPDATE session_frames set frame_id = frame_id - 1 WHERE frame_id > ?", (frame_id,))
         # TODO: primatives
 
-    def get_random_frame(self, session_type):
+    def get_random_frame(self, session_type, exclude=None):
         """selects a random card from the user's cards"""
+
+        if exclude:
+            exclude = " AND frame_id NOT IN (%s)" % ', '.join([str(fid) for fid in exclude])
+        else:
+            exclude = ''
 
         # get weight sum
         total_weight, = self.db.execute(
             "SELECT SUM(weight) FROM user_card_weights_%s "
-            "WHERE user_id = ? AND active = 1" % session_type,
+            "WHERE user_id = ? AND active = 1%s" % (session_type, exclude),
             (self.current_user.user_id,)).fetchone()
 
         # get all cards
         frames = self.db.execute(
             "SELECT frame_id, weight FROM user_card_weights_%s "
-            "WHERE user_id = ? AND active = 1 "
-            "ORDER BY weight DESC, last_seen" % session_type,
+            "WHERE user_id = ? AND active = 1%s "
+            "ORDER BY weight DESC, last_seen" % (session_type, exclude),
             (self.current_user.user_id,)).fetchall()
 
         # pick value
